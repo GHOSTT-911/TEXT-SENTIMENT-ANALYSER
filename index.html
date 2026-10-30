@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Neon Pulse — Text Sentiment & Emotion Analysis System with interactive analytics dashboard." />
+    <!-- Privacy guard: the page may not send data anywhere (no fetch/XHR, no form posts, no plugins). -->
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%23cfeabf%27/%3E%3Cpath d=%27M5 17h6l3-7 4 13 3-9 2 3h4%27 fill=%27none%27 stroke=%27%232e6b45%27 stroke-width=%273%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E" />
+    <title>Neon Pulse · Sentiment &amp; Emotion Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Caveat:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <!-- ============ Boot splash ============ -->
+    <div id="splash" aria-hidden="true">
+      <div class="splash-inner">
+        <div class="splash-logo">
+          <svg viewBox="0 0 120 80">
+            <path d="M6 44 H34 L44 18 L60 66 L72 30 L80 44 H114" class="pulse-line" />
+          </svg>
+        </div>
+        <p class="splash-title">Neon Pulse</p>
+        <div class="splash-bar"><span></span></div>
+        <p class="splash-status">Getting ready…</p>
+      </div>
+    </div>
+
+    <div class="paper-grain" aria-hidden="true"></div>
+
+    <div class="app">
+      <!-- ============ Sidebar ============ -->
+      <aside class="sidebar">
+        <a class="brand" href="#analyzer">
+          <svg viewBox="0 0 40 40" class="brand-mark" aria-hidden="true">
+            <rect x="2" y="2" width="36" height="36" rx="10" />
+            <path d="M7 21 H13 L16 13 L20 28 L24 17 L26 21 H33" />
+          </svg>
+          <span class="brand-text"><strong>Neon Pulse</strong><small>Hinglish mood reader</small></span>
+        </a>
+
+        <nav class="nav" aria-label="Main">
+          <span class="nav-indicator" aria-hidden="true"></span>
+          <a href="#analyzer" class="nav-link" data-view="analyzer">
+            <svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-6" /></svg><span>Analyzer</span>
+          </a>
+          <a href="#batch" class="nav-link" data-view="batch">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" /></svg><span>Batch</span>
+          </a>
+          <a href="#compare" class="nav-link" data-view="compare">
+            <svg viewBox="0 0 24 24"><path d="M8 3v18M16 3v18M3 8h5M16 16h5" /></svg><span>Compare</span>
+          </a>
+          <a href="#dashboard" class="nav-link" data-view="dashboard">
+            <svg viewBox="0 0 24 24"><path d="M4 4h7v9H4zM13 4h7v5h-7zM13 11h7v9h-7zM4 15h7v5H4z" /></svg><span>Dashboard</span>
+          </a>
+          <a href="#evaluation" class="nav-link" data-view="evaluation">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" /></svg><span>Evaluation</span>
+          </a>
+          <a href="#about" class="nav-link" data-view="about">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" /></svg><span>About</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-foot">
+          <button type="button" id="theme-toggle" class="btn ghost small" aria-label="Toggle light/dark theme">
+            <span class="theme-icon" aria-hidden="true">◐</span> <span class="theme-text">Light mode</span>
+          </button>
+          <button type="button" class="btn ghost small pal-open" id="pal-open" aria-label="Open command palette"><span>Search commands</span> <kbd>Ctrl K</kbd></button>
+          <p class="engine-status"><span class="dot"></span> <span>Texts read: <span id="engine-count">0</span></span></p>
+        </div>
+      </aside>
+
+      <!-- ============ Main ============ -->
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="view-eyebrow">Module 01</p>
+            <h1 id="view-title">Sentiment Analyzer</h1>
+            <p class="tagline"><span id="typewriter"></span><span class="caret">|</span></p>
+          </div>
+          <div class="topbar-chips">
+            <span class="chip-static"><span class="dot"></span> Works offline</span>
+            <span class="chip-static">🔒 Text stays on this device</span>
+            <span class="chip-static">🇮🇳 English + Hinglish</span>
+          </div>
+        </header>
+
+        <!-- ===================== ANALYZER ===================== -->
+        <section class="view" id="view-analyzer" data-title="Sentiment Analyzer" data-eyebrow="Module 01">
+          <div class="grid analyzer-grid">
+            <div class="card input-card reveal">
+              <div class="card-head">
+                <h2>Input Text</h2>
+                <div class="head-actions">
+                  <button type="button" class="icon-btn" id="voice-btn" data-tip="Voice input (uses your browser's speech service)" hidden>
+                    <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
+                  </button>
+                  <label class="icon-btn" data-tip="Load a .txt file">
+                    <svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L7 8m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" /></svg>
+                    <input type="file" id="file-input" accept=".txt,.md,.csv,text/plain" hidden />
+                  </label>
+                </div>
+              </div>
+
+              <form id="analyze-form" novalidate>
+                <div class="textarea-wrap">
+                  <textarea id="text-input" rows="8" maxlength="5000" placeholder="Type in English or Hinglish — e.g. &quot;movie bahut acchi thi but songs bakwas the&quot;" aria-label="Text to analyze"></textarea>
+                  <div class="scanline" aria-hidden="true"></div>
+                </div>
+                <p class="ink-note" id="ink-note" aria-live="polite"></p>
+                <div class="form-meta">
+                  <span><span id="char-count">0</span>/5000 chars · <span id="word-count">0</span> words</span>
+                  <span id="form-error" class="form-error" role="alert" hidden></span>
+                </div>
+                <div class="form-options">
+                  <label class="switch"><input type="checkbox" id="live-toggle" /><span class="slider"></span> Live analysis</label>
+                  <span class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span>
+                </div>
+                <div class="btn-row">
+                  <button type="submit" class="btn primary" id="analyze-btn"><span class="btn-shine"></span><span class="btn-text">Analyze</span></button>
+                  <button type="button" class="btn ghost" id="clear-btn">Clear</button>
+                </div>
+              </form>
+
+              <p class="mini-heading">Quick samples</p>
+              <div class="chip-row" id="samples"></div>
+            </div>
+
+            <div class="card verdict-card reveal">
+              <div class="card-head"><h2>Verdict</h2><span class="badge" id="elapsed">— ms</span></div>
+              <div class="empty-state" id="empty-state">
+                <div class="radar-sweep" aria-hidden="true"></div>
+                <p>Awaiting input signal…</p>
+              </div>
+              <div class="verdict-body" id="verdict-body" hidden>
+                <div class="verdict-top">
+                  <div class="face-wrap" id="face"></div>
+                  <div>
+                    <p class="verdict-label" id="verdict-label">Neutral</p>
+                    <p class="verdict-sub">Confidence <strong id="confidence">0%</strong></p>
+                    <p class="verdict-sub">Dominant emotion <strong id="dominant">—</strong></p>
+                    <p class="verdict-sub">Language <strong id="language">—</strong></p>
+                  </div>
+                </div>
+                <div class="gauge-wrap" id="gauge"></div>
+                <p class="gauge-value">Compound score <strong id="compound">0.00</strong></p>
+                <div class="split-bar" aria-hidden="true">
+                  <span class="sb-pos" id="sb-pos"></span><span class="sb-neu" id="sb-neu"></span><span class="sb-neg" id="sb-neg"></span>
+                </div>
+                <ul class="split-legend">
+                  <li><i class="pos"></i>Positive <strong id="pos-pct">0%</strong></li>
+                  <li><i class="neu"></i>Neutral <strong id="neu-pct">0%</strong></li>
+                  <li><i class="neg"></i>Negative <strong id="neg-pct">0%</strong></li>
+                </ul>
+                <p class="margin-note" id="margin-note"></p>
+                <div class="ml-opinion" id="ml-opinion">
+                  <span class="ml-chip">🤖 ML second opinion</span>
+                  <span id="ml-text">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="results" id="results" hidden>
+            <div class="grid kpi-grid">
+              <div class="kpi reveal"><span class="kpi-label">Words</span><strong class="kpi-value" id="k-words">0</strong></div>
+              <div class="kpi reveal"><span class="kpi-label">Sentences</span><strong class="kpi-value" id="k-sentences">0</strong></div>
+              <div class="kpi reveal"><span class="kpi-label">Readability</span><strong class="kpi-value" id="k-flesch">0</strong><small id="k-level">—</small></div>
+              <div class="kpi reveal"><span class="kpi-label">Reading time</span><strong class="kpi-value" id="k-time">0</strong><small>seconds</small></div>
+              <div class="kpi reveal"><span class="kpi-label">Lexical diversity</span><strong class="kpi-value" id="k-lex">0</strong><small>% unique</small></div>
+              <div class="kpi reveal"><span class="kpi-label">Signals found</span><strong class="kpi-value" id="k-signals">0</strong><small>sentiment words</small></div>
+            </div>
+
+            <div class="card reveal why-card">
+              <div class="card-head">
+                <h2>Why this verdict?</h2>
+                <span class="badge">each word removed and the text re-scored</span>
+              </div>
+              <div class="why-grid">
+                <div id="why-bars" class="why-bars"></div>
+                <div class="why-text">
+                  <p class="why-lead" id="why-lead"></p>
+                  <p class="muted small">Bars show how far the score would move if that word were taken out. Words like <em>nahi</em>, <em>bahut</em> or <em>but</em> appear here too, because they change how the words around them count.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>What it says about each topic</h2><span class="badge" id="aspect-badge">aspects</span></div>
+                <div id="aspects" class="aspects"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Sarcasm &amp; mixed signals</h2><span class="badge">rule-based check</span></div>
+                <div id="sarcasm" class="sarcasm"></div>
+              </div>
+            </div>
+
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Emotion Radar</h2><span class="badge">Plutchik model</span></div>
+                <div class="chart-box square" id="emotion-radar"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Emotion Breakdown</h2></div>
+                <div id="emotion-bars"></div>
+                <p class="muted small" id="emotion-note"></p>
+              </div>
+            </div>
+
+            <div class="card reveal">
+              <div class="card-head"><h2>Sentence Mood Timeline</h2><span class="badge" id="timeline-badge">0 sentences</span></div>
+              <div class="chart-box wide" id="timeline"></div>
+            </div>
+
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Word Cloud</h2></div>
+                <div class="wordcloud" id="wordcloud"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Highlighted Text</h2><span class="legend-inline"><i class="pos"></i>positive <i class="neg"></i>negative</span></div>
+                <div class="highlight" id="highlight"></div>
+              </div>
+            </div>
+
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Top Keywords</h2></div>
+                <div id="keyword-bars"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Sentence Breakdown</h2></div>
+                <ol class="sentence-list" id="sentence-list"></ol>
+              </div>
+            </div>
+
+            <div class="card actions-card reveal">
+              <div>
+                <h2>Export Report</h2>
+                <p class="muted small">Save or share this analysis.</p>
+              </div>
+              <div class="btn-row wrap">
+                <button type="button" class="btn primary small" id="card-btn">Download mood card</button>
+                <button type="button" class="btn ghost" id="copy-btn">Copy summary</button>
+                <button type="button" class="btn ghost" id="json-btn">Download JSON</button>
+                <button type="button" class="btn ghost" id="print-btn">Print / PDF</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== BATCH ===================== -->
+        <section class="view" id="view-batch" data-title="Batch Analysis" data-eyebrow="Module 02" hidden>
+          <div class="card reveal">
+            <div class="card-head">
+              <h2>Bulk Input</h2>
+              <div class="head-actions">
+                <button type="button" class="btn ghost small" id="batch-demo">Load demo reviews</button>
+                <label class="btn ghost small">Upload CSV / TXT<input type="file" id="batch-file" accept=".csv,.txt,text/csv,text/plain" hidden /></label>
+              </div>
+            </div>
+            <p class="muted small">One text per line. For CSV files, the column named <code>text</code>, <code>review</code> or <code>comment</code> is used (otherwise the first column). Up to 2,000 rows.</p>
+            <textarea id="batch-input" rows="7" placeholder="Great product, works perfectly!&#10;Terrible support, never buying again.&#10;Delivery was on time."></textarea>
+            <div class="btn-row">
+              <button type="button" class="btn primary" id="batch-run"><span class="btn-shine"></span><span class="btn-text">Run batch analysis</span></button>
+              <button type="button" class="btn ghost" id="batch-clear">Clear</button>
+            </div>
+            <div class="progress" id="batch-progress" hidden><span></span><em>0%</em></div>
+          </div>
+
+          <div id="batch-results" hidden>
+            <div class="grid kpi-grid four">
+              <div class="kpi reveal"><span class="kpi-label">Texts analyzed</span><strong class="kpi-value" id="b-total">0</strong></div>
+              <div class="kpi reveal pos"><span class="kpi-label">Positive</span><strong class="kpi-value" id="b-pos">0</strong><small>%</small></div>
+              <div class="kpi reveal neg"><span class="kpi-label">Negative</span><strong class="kpi-value" id="b-neg">0</strong><small>%</small></div>
+              <div class="kpi reveal"><span class="kpi-label">Average score</span><strong class="kpi-value" id="b-avg">0</strong></div>
+            </div>
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Distribution</h2></div>
+                <div class="chart-box square" id="b-donut"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Emotions Across Dataset</h2></div>
+                <div id="b-emotions"></div>
+              </div>
+            </div>
+            <div class="card reveal">
+              <div class="card-head"><h2>Score per Text</h2></div>
+              <div class="chart-box wide" id="b-line"></div>
+            </div>
+            <div class="card reveal">
+              <div class="card-head">
+                <h2>Results Table</h2>
+                <div class="head-actions">
+                  <input type="search" id="b-search" placeholder="Search…" aria-label="Search results" />
+                  <select id="b-filter" aria-label="Filter by label">
+                    <option value="">All labels</option><option>Positive</option><option>Neutral</option><option>Negative</option>
+                  </select>
+                  <button type="button" class="btn ghost small" id="b-export">Export CSV</button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th data-sort="index">#</th><th data-sort="text">Text</th><th data-sort="label">Label</th><th data-sort="compound">Score</th><th data-sort="emotion">Emotion</th><th data-sort="lang">Language</th></tr></thead>
+                  <tbody id="b-tbody"></tbody>
+                </table>
+              </div>
+              <p class="muted small" id="b-count"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== COMPARE ===================== -->
+        <section class="view" id="view-compare" data-title="Compare Texts" data-eyebrow="Module 03" hidden>
+          <div class="grid two">
+            <div class="card reveal">
+              <div class="card-head"><h2><span class="tag-a">A</span> Text A</h2></div>
+              <textarea id="cmp-a" rows="7" placeholder="First text…"></textarea>
+            </div>
+            <div class="card reveal">
+              <div class="card-head"><h2><span class="tag-b">B</span> Text B</h2></div>
+              <textarea id="cmp-b" rows="7" placeholder="Second text…"></textarea>
+            </div>
+          </div>
+          <div class="btn-row center">
+            <button type="button" class="btn primary" id="cmp-run"><span class="btn-shine"></span><span class="btn-text">Compare</span></button>
+            <button type="button" class="btn ghost" id="cmp-demo">Try an example</button>
+            <button type="button" class="btn ghost" id="cmp-swap">Swap ⇄</button>
+          </div>
+          <div id="cmp-results" hidden>
+            <div class="card verdict-banner reveal" id="cmp-verdict"></div>
+            <div class="grid two">
+              <div class="card reveal center-text">
+                <div class="card-head"><h2><span class="tag-a">A</span> Score</h2><strong id="cmp-a-label"></strong></div>
+                <div class="gauge-wrap" id="cmp-gauge-a"></div>
+              </div>
+              <div class="card reveal center-text">
+                <div class="card-head"><h2><span class="tag-b">B</span> Score</h2><strong id="cmp-b-label"></strong></div>
+                <div class="gauge-wrap" id="cmp-gauge-b"></div>
+              </div>
+            </div>
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Emotion Overlay</h2><span class="legend-inline"><i class="a"></i>A <i class="b"></i>B</span></div>
+                <div class="chart-box square" id="cmp-radar"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Head-to-Head</h2></div>
+                <div class="versus" id="cmp-versus"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== DASHBOARD ===================== -->
+        <section class="view" id="view-dashboard" data-title="Analytics Dashboard" data-eyebrow="Module 04" hidden>
+          <div class="dash-empty card reveal" id="dash-empty">
+            <div class="radar-sweep" aria-hidden="true"></div>
+            <h2>No analyses yet</h2>
+            <p class="muted">Run a few analyses in the Analyzer, or load demo data to preview the dashboard.</p>
+            <button type="button" class="btn primary" id="dash-demo"><span class="btn-shine"></span><span class="btn-text">Load demo data</span></button>
+          </div>
+          <div id="dash-content" hidden>
+            <div class="grid kpi-grid four">
+              <div class="kpi reveal"><span class="kpi-label">Total analyses</span><strong class="kpi-value" id="d-total">0</strong></div>
+              <div class="kpi reveal"><span class="kpi-label">Average score</span><strong class="kpi-value" id="d-avg">0</strong></div>
+              <div class="kpi reveal"><span class="kpi-label">Words processed</span><strong class="kpi-value" id="d-words">0</strong></div>
+              <div class="kpi reveal"><span class="kpi-label">Top emotion</span><strong class="kpi-value emoji" id="d-emotion">—</strong><small id="d-emotion-label"></small></div>
+            </div>
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Sentiment Distribution</h2></div>
+                <div class="chart-box square" id="d-donut"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Emotion Profile</h2></div>
+                <div class="chart-box square" id="d-radar"></div>
+              </div>
+            </div>
+            <div class="card reveal">
+              <div class="card-head"><h2>Mood Trend</h2><span class="badge">last 30 analyses</span></div>
+              <div class="chart-box wide" id="d-trend"></div>
+            </div>
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Activity by Hour</h2></div>
+                <div class="heatmap" id="d-heatmap"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head">
+                  <h2>Recent History</h2>
+                  <div class="head-actions">
+                    <button type="button" class="btn ghost small" id="d-demo2">+ Demo data</button>
+                    <button type="button" class="btn ghost small danger" id="d-clear">Clear data</button>
+                  </div>
+                </div>
+                <ul class="history-list" id="d-history"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== EVALUATION ===================== -->
+        <section class="view" id="view-evaluation" data-title="Model Evaluation" data-eyebrow="Module 05 · Research" hidden>
+          <div class="sample-banner reveal" id="sample-banner" hidden>
+            <strong>⚠ Demo dataset in use.</strong> These sentences were written to test the pipeline, and the rule engine's word list was built alongside them, so its score here is inflated.
+            Upload your team's collected &amp; labelled comments for results you can report.
+          </div>
+
+          <div class="grid two">
+            <div class="card reveal">
+              <div class="card-head">
+                <h2>Dataset</h2>
+                <span class="badge" id="ds-name">—</span>
+              </div>
+              <div class="ds-stats">
+                <div><span class="kpi-label">Rows</span><strong class="kpi-value" id="ds-rows">0</strong></div>
+                <div><span class="kpi-label">Hinglish share</span><strong class="kpi-value" id="ds-hinglish">0</strong><small>%</small></div>
+              </div>
+              <div id="ds-bars"></div>
+              <div class="btn-row wrap" style="margin-top:1rem">
+                <label class="btn ghost small">Upload labelled CSV<input type="file" id="ds-file" accept=".csv,text/csv" hidden /></label>
+                <button type="button" class="btn ghost small" id="ds-reset">Use bundled dataset</button>
+              </div>
+              <p class="muted small">CSV needs columns <code>text</code> and <code>label</code> (Positive / Negative / Neutral).</p>
+            </div>
+            <div class="card reveal">
+              <div class="card-head"><h2>Experiment Setup</h2></div>
+              <ul class="feature-list compact">
+                <li>Stratified <strong id="k-label">5</strong>-fold cross-validation (fixed seed, reproducible)</li>
+                <li>5 engines evaluated on identical folds</li>
+                <li>ML features: Hinglish-normalised unigrams + bigrams</li>
+                <li>Metrics: accuracy, macro precision / recall / F1, confusion matrix</li>
+              </ul>
+              <div class="form-options" style="margin-top:1rem">
+                <label class="muted small">Folds
+                  <select id="k-select" aria-label="Number of folds"><option>3</option><option selected>5</option><option>10</option></select>
+                </label>
+              </div>
+              <div class="btn-row">
+                <button type="button" class="btn primary" id="eval-run"><span class="btn-shine"></span><span class="btn-text">Run evaluation</span></button>
+              </div>
+              <div class="progress" id="eval-progress" hidden><span></span><em>0%</em></div>
+            </div>
+          </div>
+
+          <div id="eval-results" hidden>
+            <div class="grid kpi-grid four">
+              <div class="kpi reveal"><span class="kpi-label">Best engine</span><strong class="kpi-value small-kpi" id="e-best">—</strong></div>
+              <div class="kpi reveal pos"><span class="kpi-label">Best accuracy</span><strong class="kpi-value" id="e-best-acc">0</strong><small>%</small></div>
+              <div class="kpi reveal"><span class="kpi-label">English baseline</span><strong class="kpi-value" id="e-base">0</strong><small>%</small></div>
+              <div class="kpi reveal pos"><span class="kpi-label">Improvement</span><strong class="kpi-value" id="e-gain">0</strong><small>percentage points</small></div>
+            </div>
+
+            <div class="card reveal">
+              <div class="card-head"><h2>Results Table</h2><span class="badge" id="e-cv">k-fold CV</span></div>
+              <div class="table-wrap">
+                <table class="data-table results-table">
+                  <thead><tr><th>Engine</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>Macro F1</th><th>ms / text</th></tr></thead>
+                  <tbody id="e-tbody"></tbody>
+                </table>
+              </div>
+              <div class="btn-row wrap" style="margin-top:1rem">
+                <button type="button" class="btn ghost small" id="e-export">Export results CSV</button>
+              </div>
+            </div>
+
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head"><h2>Accuracy</h2></div>
+                <div id="e-acc-bars"></div>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>Macro F1</h2></div>
+                <div id="e-f1-bars"></div>
+              </div>
+            </div>
+
+            <div class="card reveal">
+              <div class="card-head"><h2>Confusion Matrices</h2><span class="legend-inline">rows = actual · columns = predicted</span></div>
+              <div class="cm-grid" id="e-cms"></div>
+            </div>
+
+            <div class="grid two">
+              <div class="card reveal">
+                <div class="card-head">
+                  <h2>Error Analysis</h2>
+                  <select id="e-err-engine" aria-label="Engine for error analysis"></select>
+                </div>
+                <div class="table-wrap short">
+                  <table class="data-table">
+                    <thead><tr><th>Text</th><th>Actual</th><th>Predicted</th></tr></thead>
+                    <tbody id="e-errors"></tbody>
+                  </table>
+                </div>
+                <p class="muted small" id="e-err-count"></p>
+              </div>
+              <div class="card reveal">
+                <div class="card-head"><h2>What the ML Model Learned</h2><span class="badge">Naive Bayes top features</span></div>
+                <div id="e-features" class="feature-cols"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card reveal">
+            <div class="card-head"><h2>Engine Playground</h2><span class="badge">all 5 engines live</span></div>
+            <textarea id="pg-input" rows="3" placeholder="Try: &quot;Phone ka camera zabardast hai but battery bilkul bekaar&quot;"></textarea>
+            <div class="chip-row" id="pg-samples" style="margin-top:0.7rem"></div>
+            <div class="pg-grid" id="pg-out"></div>
+          </div>
+        </section>
+
+        <!-- ===================== ABOUT ===================== -->
+        <section class="view" id="view-about" data-title="About the Project" data-eyebrow="Documentation" hidden>
+          <div class="card hero-card reveal">
+            <p class="eyebrow">B.Tech Major Project · Department of Computer Science &amp; Engineering</p>
+            <h2 class="hero-title">Neon Pulse: Sentiment &amp; Emotion Analysis of Code-Mixed Hinglish Text using a Hybrid Rule-Based and Machine Learning Approach</h2>
+            <p class="muted">
+              <strong>Abstract —</strong> Social media users in India routinely mix Hindi and English in Roman script
+              ("movie acchi nahi thi but songs mast the"). Standard English sentiment tools fail on such code-mixed text
+              because they neither recognise Hindi vocabulary nor its post-positional negation. Neon Pulse addresses this
+              with (i) a Hinglish-aware lexicon with spelling-variant normalisation, Hindi negation handling and
+              intensifiers, (ii) machine-learning classifiers (Naive Bayes, Logistic Regression) trained on a labelled
+              Hinglish corpus, and (iii) a hybrid model that fuses both. All engines are compared using stratified k-fold
+              cross-validation. The system also detects eight emotions and provides batch, comparative and longitudinal
+              analytics through an animated, fully client-side dashboard that preserves user privacy.
+            </p>
+          </div>
+
+          <div class="card reveal">
+            <div class="card-head"><h2>System Architecture</h2><span class="badge">data flow</span></div>
+            <div class="pipeline" id="pipeline">
+              <div class="stage"><span class="stage-n">01</span><strong>Input Layer</strong><small>Keyboard · Voice · File · CSV</small></div>
+              <div class="stage"><span class="stage-n">02</span><strong>Language ID</strong><small>English / Hinglish / Roman Hindi · Spelling normalisation</small></div>
+              <div class="stage"><span class="stage-n">03</span><strong>Rule Engine</strong><small>EN + Hinglish lexicon · Pre &amp; post negation · Boosters</small></div>
+              <div class="stage"><span class="stage-n">04</span><strong>ML Engine</strong><small>Naive Bayes · Logistic Regression · Hybrid fusion</small></div>
+              <div class="stage"><span class="stage-n">05</span><strong>Emotion &amp; Stats</strong><small>Plutchik 8 emotions · Readability · Keywords</small></div>
+              <div class="stage"><span class="stage-n">06</span><strong>Visualisation</strong><small>SVG gauge · Radar · Timeline · Word cloud</small></div>
+            </div>
+          </div>
+
+          <div class="grid two">
+            <div class="card reveal">
+              <div class="card-head"><h2>Algorithm</h2></div>
+              <ol class="steps">
+                <li>Tokenise text into words, emoji, emoticons and punctuation.</li>
+                <li>Normalise Hinglish spellings (<code>bahot/bhot → bahut</code>) and look up valence <code>v ∈ [−4, +4]</code> in the English + Hinglish lexicon.</li>
+                <li>Multiply by intensifier factor (<code>very ×1.5</code>, <code>slightly ×0.5</code>).</li>
+                <li>Negation: English pre-negation window ("not good") and Hindi post-negation look-back ("accha <em>nahi</em>"), both <code>×−0.75</code>.</li>
+                <li>Halve weight before "but / lekin / magar", amplify after it (<code>×1.5</code>).</li>
+                <li>Boost CAPS (<code>×1.3</code>) and exclamation marks (up to <code>+32%</code>).</li>
+                <li>Normalise: <code>compound = x / √(x² + 15)</code> → range −1 … +1.</li>
+                <li>Label: ≥ +0.05 positive, ≤ −0.05 negative, otherwise neutral.</li>
+                <li>Hybrid: <code>P = 0.4·P<sub>rules</sub> + 0.6·P<sub>NaiveBayes</sub></code>, label = argmax.</li>
+              </ol>
+            </div>
+            <div class="card reveal">
+              <div class="card-head"><h2>Features</h2></div>
+              <ul class="feature-list">
+                <li>Hinglish (code-mixed) sentiment with language detection</li>
+                <li>"Why this verdict?" word-level explanations (leave-one-out)</li>
+                <li>Aspect-based sentiment: camera, battery, price, acting, songs…</li>
+                <li>Sarcasm &amp; mixed-signal check with reasons</li>
+                <li>Shareable PNG mood card</li>
+                <li>Command palette (Ctrl + K) and live mood ink while typing</li>
+                <li>ML models + hybrid engine with k-fold evaluation</li>
+                <li>Real-time & live-typing sentiment analysis</li>
+                <li>8-emotion detection with radar visualisation</li>
+                <li>Sentence-level mood timeline</li>
+                <li>Batch CSV processing with export</li>
+                <li>Side-by-side text comparison</li>
+                <li>Persistent analytics dashboard & heatmap</li>
+                <li>Voice input via Web Speech API</li>
+                <li>JSON / PDF report export</li>
+                <li>Dark & light themes, fully responsive</li>
+                <li>REST API (<code>POST /api/analyze</code>)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="grid two">
+            <div class="card reveal">
+              <div class="card-head"><h2>Technology Stack</h2></div>
+              <div class="chip-row">
+                <span class="chip-static">HTML5</span><span class="chip-static">CSS3 Animations</span><span class="chip-static">JavaScript (ES2020)</span>
+                <span class="chip-static">SVG Graphics</span><span class="chip-static">Canvas API</span><span class="chip-static">Web Speech API</span>
+                <span class="chip-static">Node.js HTTP</span><span class="chip-static">LocalStorage</span><span class="chip-static">REST</span><span class="chip-static">Naive Bayes</span><span class="chip-static">Logistic Regression</span><span class="chip-static">Python · scikit-learn</span>
+              </div>
+              <h3 class="sub-h">Future Scope</h3>
+              <ul class="feature-list compact">
+                <li>Transformer models (BERT) for context & sarcasm</li>
+                <li>Devanagari Hindi and other Indian languages</li>
+                <li>Live social-media stream monitoring</li>
+                <li>Learned aspect extraction instead of keyword lists</li>
+              </ul>
+            </div>
+            <div class="card reveal">
+              <div class="card-head"><h2>Project Team</h2></div>
+              <!-- ✏️ Edit these names in index.html -->
+              <table class="team-table">
+                <thead><tr><th>Name</th><th>Roll No.</th><th>Role</th></tr></thead>
+                <tbody>
+                  <tr><td>Student Name 1</td><td>XXXXXXXX</td><td>NLP Engine</td></tr>
+                  <tr><td>Student Name 2</td><td>XXXXXXXX</td><td>Visualisation</td></tr>
+                  <tr><td>Student Name 3</td><td>XXXXXXXX</td><td>Frontend / UX</td></tr>
+                  <tr><td>Student Name 4</td><td>XXXXXXXX</td><td>Backend & Testing</td></tr>
+                </tbody>
+              </table>
+              <p class="muted small guide">Project Guide: <strong>Prof. Guide Name</strong> · Session 2026–27</p>
+            </div>
+          </div>
+        </section>
+
+        <footer class="site-footer">
+          Neon Pulse v4 — Hinglish-aware sentiment. Nothing you type leaves this device.
+        </footer>
+      </main>
+    </div>
+
+    <script src="js/language.js"></script>
+    <script src="js/sentiment.js"></script>
+    <script src="js/emotion.js"></script>
+    <script src="js/textstats.js"></script>
+    <script src="js/pipeline.js"></script>
+    <script src="js/ml.js"></script>
+    <script src="js/dataset.js"></script>
+    <script src="js/insights.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/wordcloud.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/extras.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/analyzer.js"></script>
+    <script src="js/batch.js"></script>
+    <script src="js/compare.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/evaluation.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
